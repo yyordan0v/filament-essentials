@@ -13,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 
@@ -40,6 +41,10 @@ class TalkResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->persistFiltersInSession()
+            ->filtersTriggerAction(function ($action) {
+                return $action->button()->label('Filters');
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
@@ -73,7 +78,20 @@ class TalkResource extends Resource
                     })
             ])
             ->filters([
-                //
+                Tables\Filters\TernaryFilter::make('new_talk'),
+                SelectFilter::make('speaker')
+                    ->relationship('speaker', 'name')
+                    ->multiple()
+                    ->searchable()
+                    ->preload(),
+                Tables\Filters\Filter::make('has_avatar')
+                    ->label('Show only speakers with avatars')
+                    ->query(function ($query) {
+                        return $query->whereHas('speaker', function ($query) {
+                            $query->whereNotNull('avatar');
+                        });
+                    }),
+
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
