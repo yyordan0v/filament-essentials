@@ -3,6 +3,16 @@
 namespace App\Models;
 
 use App\Enums\Region;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Get;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -33,5 +43,73 @@ class Conference extends Model
     public function talks(): BelongsToMany
     {
         return $this->belongsToMany(Talk::class);
+    }
+
+    public static function getForm(): array
+    {
+
+        return [
+            Section::make('Conference Details')
+                ->columns(2)
+                ->description('Provide some basic information about the conference')
+                ->schema([
+                    TextInput::make('name')
+                        ->label('Conference')
+                        ->helperText('Name of the Conference')
+                        ->columnSpanFull()
+                        ->required()
+                        ->maxLength(50),
+                    RichEditor::make('description')
+                        ->columnSpanFull()
+                        ->required(),
+                    DateTimePicker::make('start_date')
+                        ->required(),
+                    DateTimePicker::make('end_date')
+                        ->required(),
+                    Fieldset::make('Conference Status')
+                        ->columns(1)
+                        ->schema([
+                            Select::make('status')
+                                ->options([
+                                    'draft' => 'Draft',
+                                    'published' => 'Published',
+                                    'rejected' => 'Rejected',
+                                    'archived' => 'Archived',
+                                ])
+                                ->required(),
+                            Toggle::make('is_published')
+                                ->default(true),
+                        ]),
+                ]),
+            Section::make('Location')
+                ->columns(2)
+                ->schema([
+                    Select::make('region')
+                        ->live()
+                        ->enum(Region::class)
+                        ->options(Region::class)
+                        ->required(),
+                    Select::make('venue_id')
+                        ->searchable()
+                        ->preload()
+                        ->editOptionForm(Venue::getForm())
+                        ->createOptionForm(Venue::getForm())
+                        ->relationship('venue', 'name', modifyQueryUsing: function (Builder $query, Get $get) {
+                            return $query->where('region', $get('region'));
+                        }),
+                ]),
+            Fieldset::make('Speakers List')
+                ->schema([
+                    CheckboxList::make('speakers')
+                        ->relationship('speakers', 'name')
+                        ->options(
+                            Speaker::all()->pluck('name', 'id')
+                        )
+                        ->columns(4)
+                        ->columnSpanFull()
+                        ->searchable()
+                        ->required(),
+                ])
+        ];
     }
 }
