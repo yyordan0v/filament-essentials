@@ -12,7 +12,7 @@ enum TalkStatus: string
     {
         return match ($this) {
             self::SUBMITTED => 'primary',
-            self::APPROVED => 'warning',
+            self::APPROVED => 'success',
             self::REJECTED => 'danger',
         };
     }
