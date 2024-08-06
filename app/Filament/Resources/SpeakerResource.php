@@ -20,7 +20,7 @@ class SpeakerResource extends Resource
 {
     protected static ?string $model = Speaker::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    protected static ?string $navigationIcon = 'heroicon-o-user';
 
     public static function form(Form $form): Form
     {

@@ -2,4 +2,4 @@
 
 use App\Livewire\ConferenceSignUpPage;
 
-Route::get('/', ConferenceSignUpPage::class);
+Route::get('/conference-sign-up', ConferenceSignUpPage::class);
