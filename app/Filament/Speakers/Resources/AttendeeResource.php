@@ -5,19 +5,16 @@ namespace App\Filament\Speakers\Resources;
 use App\Filament\Speakers\Resources\AttendeeResource\Pages;
 use App\Filament\Speakers\Resources\AttendeeResource\RelationManagers;
 use App\Models\Attendee;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class AttendeeResource extends Resource
 {
     protected static ?string $model = Attendee::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'icon-home';
 
     public static function form(Form $form): Form
     {
